@@ -14,8 +14,7 @@ import (
 )
 
 func main() {
-	// mongoURI := os.Getenv("MONGO_URI")
-	mongoURI := "mongodb+srv://testboy:<Hbombata7?>@cluster0.rgc6m.mongodb.net/?retryWrites=true&w=majority"
+	mongoURI := os.Getenv("MONGO_URI")
 	fmt.Println("mongo: ", mongoURI)
 
 	ctx := context.Background()
@@ -29,7 +28,7 @@ func main() {
 
 	// Create Book
 	server.POST("/books", func(c *gin.Context) {
-		// marshal request body into struct
+		// marshclal request body into struct
 
 		book := &Book{}
 		// use datastore to store struct
