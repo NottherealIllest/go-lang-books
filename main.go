@@ -28,11 +28,20 @@ func main() {
 
 	// Create Book
 	server.POST("/books", func(c *gin.Context) {
-		// marshclal request body into struct
+		// marshal request body into struct
 
 		book := &Book{}
+
+		err := c.ShouldBind(book)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		// use datastore to store struct
-		err := datastore.CreateBook(c, book)
+		err = datastore.CreateBook(c, book)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -42,25 +51,25 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+			"data": book,
 		})
 	})
 
 	// Get Books
 	server.GET("/books", func(c *gin.Context) {
 		// marshal request body into struct
-
-		book := &Book{}
-		// use datastore to store struct
-		err := datastore.CreateBook(c, book)
+		books, err := datastore.FindBooks(ctx)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
+		// use datastore to store struct
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+			"data":   &books,
 		})
 	})
 
@@ -68,9 +77,10 @@ func main() {
 	server.GET("/books/:id", func(c *gin.Context) {
 		// marshal request body into struct
 
-		book := &Book{}
+		// https://pkg.go.dev/github.com/gin-gonic/gin
+
 		// use datastore to store struct
-		err := datastore.CreateBook(c, book)
+		res, err := datastore.GetBook(c, c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -80,6 +90,7 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+			"data":    res,
 		})
 	})
 
@@ -88,8 +99,17 @@ func main() {
 		// marshal request body into struct
 
 		book := &Book{}
+		err := c.ShouldBind(book)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		
+		id := c.Param("id") 
 		// use datastore to store struct
-		err := datastore.CreateBook(c, book)
+		err = datastore.UpdateBook(c, id, book)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -99,6 +119,7 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+			"data": book,
 		})
 	})
 
@@ -108,7 +129,7 @@ func main() {
 
 		book := &Book{}
 		// use datastore to store struct
-		err := datastore.CreateBook(c, book)
+		err := datastore.DeleteBook(c, c.Param("id"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -118,6 +139,7 @@ func main() {
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+			"data":    book,
 		})
 	})
 	log.Println("finished setting up")
