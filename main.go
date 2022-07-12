@@ -145,7 +145,7 @@ func main() {
 	log.Println("finished setting up")
 
 	go func() {
-		server.Run(fmt.Sprintf("localhost:%s", os.Getenv("PORT")))
+		server.Run(fmt.Sprintf("%s", os.Getenv("PORT")))
 	}()
 
 	log.Println("server started")
